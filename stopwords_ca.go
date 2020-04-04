@@ -2,6 +2,7 @@ package stopwords
 
 var catalan = map[string]string{
   "de": "",
+  "d'el": "",
   "es": "",
   "i": "",
   "a": "",

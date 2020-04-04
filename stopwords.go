@@ -96,6 +96,8 @@ func GetLanguage(content []byte, langCodes []string) ([]byte, []string, int, int
   }
   if maxCount > 0 && len(guessedLanguages) > 0 {
     content, _, total = removeStopWordsCount(content, *stop[guessedLanguages[0]])
+    //Remove duplicated space characters
+    content = oneSpace.ReplaceAll(content, []byte(" "))
   }
   return content, guessedLanguages, maxCount, total
 }

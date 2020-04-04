@@ -81,12 +81,15 @@ func GetLanguage(content []byte, langCodes []string) ([]byte, []string, int, int
   for _, l := range langCodes {
     //Parse language
 
-    _, count, _ := removeStopWordsCount(content, *stop[l])
-    //Remove stop words by using a list of most frequent words
-    if count > maxCount {
-      maxCount = count
+    il, ok := stop[l]
+    if ok {
+      _, count, _ := removeStopWordsCount(content, *il)
+      //Remove stop words by using a list of most frequent words
+      if count > maxCount {
+        maxCount = count
+      }
+      counts = append(counts, count)
     }
-    counts = append(counts, count)
   }
   total:=0
   for i, c := range counts {

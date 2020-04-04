@@ -72,6 +72,7 @@ func OverwriteWordSegmenter(expression string) {
 
 func GetLanguage(content []byte, langCodes []string) ([]byte, []string, int, int) {
   maxCount := 0
+  counts := []int{}
   guessedLanguages := []string{}
   //Remove HTML tags
     content = remTags.ReplaceAll(content, []byte(" "))
@@ -84,10 +85,15 @@ func GetLanguage(content []byte, langCodes []string) ([]byte, []string, int, int
     //Remove stop words by using a list of most frequent words
     if count > maxCount {
       maxCount = count
-      guessedLanguages = append(guessedLanguages, l)
     }
+    counts = append(counts, count)
   }
   total:=0
+  for i, c := range counts {
+    if c == maxCount {
+      guessedLanguages = append(guessedLanguages, langCodes[i])
+    }
+  }
   if maxCount > 0 && len(guessedLanguages) > 0 {
     content, _, total = removeStopWordsCount(content, *stop[guessedLanguages[0]])
   }

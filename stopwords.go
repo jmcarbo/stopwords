@@ -26,6 +26,36 @@ var (
 	remTags      = regexp.MustCompile(`<[^>]*>`)
 	oneSpace     = regexp.MustCompile(`\s{2,}`)
 	wordSegmenter = regexp.MustCompile(`[\pL\p{Mc}\p{Mn}-_']+`)
+    stop = map[string]*(map[string]string) {
+      "ar": &arabic,
+      "bg": &bulgarian,
+      "ca": &catalan,
+      "cs": &czech,
+      "da": &danish,
+      "de": &german,
+      "el": &greek,
+      "en": &english,
+      "es": &spanish,
+      "fa": &persian,
+      "fr": &french,
+      "fi": &finnish,
+      "hu": &hungarian,
+      "id": &indonesian,
+      "it": &italian,
+      "ja": &japanese,
+      "km": &khmer,
+      "lv": &latvian,
+      "nl": &dutch,
+      "no": &norwegian,
+      "pl": &polish,
+      "pt": &portuguese,
+      "ro": &romanian,
+      "ru": &russian,
+      "sk": &slovak,
+      "sv": &swedish,
+      "th": &thai,
+      "tr": &turkish,
+    }
 )
 
 // DontStripDigits changes the behaviour of the default word segmenter
@@ -38,6 +68,30 @@ func DontStripDigits() {
 // with your own regular expression
 func OverwriteWordSegmenter(expression string) {
 	wordSegmenter = regexp.MustCompile(expression)
+}
+
+func GetLanguage(content []byte, langCodes []string) ([]byte, string, int, int) {
+  maxCount := 0
+  guessedLanguage := "unknown"
+  //Remove HTML tags
+    content = remTags.ReplaceAll(content, []byte(" "))
+    content = []byte(html.UnescapeString(string(content)))
+
+  for _, l := range langCodes {
+    //Parse language
+
+    _, count, _ := removeStopWordsCount(content, *stop[l])
+    //Remove stop words by using a list of most frequent words
+    if count > maxCount {
+      maxCount = count
+      guessedLanguage = l
+    }
+  }
+  total:=0
+  if maxCount > 0 && guessedLanguage != "unknown" {
+    content, _, total = removeStopWordsCount(content, *stop[guessedLanguage])
+  }
+  return content, guessedLanguage, maxCount, total
 }
 
 // CleanString removes useless spaces and stop words from string content.
@@ -68,6 +122,8 @@ func Clean(content []byte, langCode string, cleanHTML bool) []byte {
 		content = removeStopWords(content, arabic)
 	case "bg":
 		content = removeStopWords(content, bulgarian)
+	case "ca":
+		content = removeStopWords(content, catalan)
 	case "cs":
 		content = removeStopWords(content, czech)
 	case "da":
@@ -126,9 +182,16 @@ func Clean(content []byte, langCode string, cleanHTML bool) []byte {
 	return content
 }
 
-// removeStopWords iterates through a list of words and removes stop words.
 func removeStopWords(content []byte, dict map[string]string) []byte {
+  b, _, _ := removeStopWordsCount(content, dict)
+  return b
+}
+
+// removeStopWords iterates through a list of words and removes stop words counting matches and total.
+func removeStopWordsCount(content []byte, dict map[string]string) ([]byte, int, int) {
 	var result []byte
+        count := 0
+        total := 0
 	content = norm.NFC.Bytes(content)
 	content = bytes.ToLower(content)
 	words := wordSegmenter.FindAll(content, -1)
@@ -136,10 +199,12 @@ func removeStopWords(content []byte, dict map[string]string) []byte {
 		//log.Println(w)
 		if _, ok := dict[string(w)]; ok {
 			result = append(result, ' ')
+                        count++
 		} else {
 			result = append(result, []byte(w)...)
 			result = append(result, ' ')
 		}
+                total++
 	}
-	return result
+	return result, count, total
 }

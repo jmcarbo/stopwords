@@ -70,9 +70,9 @@ func OverwriteWordSegmenter(expression string) {
 	wordSegmenter = regexp.MustCompile(expression)
 }
 
-func GetLanguage(content []byte, langCodes []string) ([]byte, string, int, int) {
+func GetLanguage(content []byte, langCodes []string) ([]byte, []string, int, int) {
   maxCount := 0
-  guessedLanguage := "unknown"
+  guessedLanguages := []string{}
   //Remove HTML tags
     content = remTags.ReplaceAll(content, []byte(" "))
     content = []byte(html.UnescapeString(string(content)))
@@ -84,14 +84,14 @@ func GetLanguage(content []byte, langCodes []string) ([]byte, string, int, int) 
     //Remove stop words by using a list of most frequent words
     if count > maxCount {
       maxCount = count
-      guessedLanguage = l
+      guessedLanguages = append(guessedLanguages, l)
     }
   }
   total:=0
-  if maxCount > 0 && guessedLanguage != "unknown" {
-    content, _, total = removeStopWordsCount(content, *stop[guessedLanguage])
+  if maxCount > 0 && len(guessedLanguages) > 0 {
+    content, _, total = removeStopWordsCount(content, *stop[guessedLanguages[0]])
   }
-  return content, guessedLanguage, maxCount, total
+  return content, guessedLanguages, maxCount, total
 }
 
 // CleanString removes useless spaces and stop words from string content.

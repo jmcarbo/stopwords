@@ -81,7 +81,7 @@ func GetLanguage(content []byte, langCodes []string) ([]byte, []string, int, int
     content = []byte(html.UnescapeString(string(content)))
 
   targetLangCodes := &langCodes
-  if len(langCodes[0]) == 0 {
+  if len(langCodes) == 0 {
     allLangCodes := []string{}
     for k, _ := range stop {
       allLangCodes = append(allLangCodes, k)

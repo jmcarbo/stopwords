@@ -30,6 +30,7 @@ var (
       "ar": &arabic,
       "bg": &bulgarian,
       "ca": &catalan,
+      "ch": &chinese,
       "cs": &czech,
       "da": &danish,
       "de": &german,
@@ -93,7 +94,7 @@ func GetLanguage(content []byte, langCodes []string) ([]byte, []string, int, int
   }
   total:=0
   for i, c := range counts {
-    if c == maxCount {
+    if c == maxCount && c > 0 {
       guessedLanguages = append(guessedLanguages, langCodes[i])
     }
   }
@@ -101,6 +102,8 @@ func GetLanguage(content []byte, langCodes []string) ([]byte, []string, int, int
     content, _, total = removeStopWordsCount(content, *stop[guessedLanguages[0]])
     //Remove duplicated space characters
     content = oneSpace.ReplaceAll(content, []byte(" "))
+  } else {
+    guessedLanguages = append(guessedLanguages, "--")
   }
   return content, guessedLanguages, maxCount, total
 }

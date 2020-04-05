@@ -104,7 +104,7 @@ func GetLanguage(content []byte, langCodes []string) ([]byte, []string, int, int
   total:=0
   for i, c := range counts {
     if c == maxCount && c > 0 {
-      guessedLanguages = append(guessedLanguages, langCodes[i])
+      guessedLanguages = append(guessedLanguages, (*targetLangCodes)[i])
     }
   }
   if maxCount > 0 && len(guessedLanguages) > 0 {

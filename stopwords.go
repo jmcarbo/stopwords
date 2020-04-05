@@ -56,6 +56,7 @@ var (
       "sv": &swedish,
       "th": &thai,
       "tr": &turkish,
+      "zu": &zulu,
     }
 )
 
@@ -79,7 +80,15 @@ func GetLanguage(content []byte, langCodes []string) ([]byte, []string, int, int
     content = remTags.ReplaceAll(content, []byte(" "))
     content = []byte(html.UnescapeString(string(content)))
 
-  for _, l := range langCodes {
+  targetLangcodes := &langCodes
+  if len(langCodes[0]) == 0 {
+    allLangCodes := []string{}
+    for k, _ := range stop {
+      allLangCodes = append(allLangCodes, k)
+    }
+    targetLangcodes = &allLangCodes
+  }
+  for _, l := range *targetLangCodes {
     //Parse language
 
     il, ok := stop[l]

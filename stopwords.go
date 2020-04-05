@@ -80,13 +80,13 @@ func GetLanguage(content []byte, langCodes []string) ([]byte, []string, int, int
     content = remTags.ReplaceAll(content, []byte(" "))
     content = []byte(html.UnescapeString(string(content)))
 
-  targetLangcodes := &langCodes
+  targetLangCodes := &langCodes
   if len(langCodes[0]) == 0 {
     allLangCodes := []string{}
     for k, _ := range stop {
       allLangCodes = append(allLangCodes, k)
     }
-    targetLangcodes = &allLangCodes
+    targetLangCodes = &allLangCodes
   }
   for _, l := range *targetLangCodes {
     //Parse language
